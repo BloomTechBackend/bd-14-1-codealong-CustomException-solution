@@ -4,6 +4,7 @@ import com.amazon.ata.dynamodbannotationsloadsave.cli.DiscussionCliOperation;
 import com.amazon.ata.dynamodbannotationsloadsave.cli.DiscussionCliState;
 import com.amazon.ata.dynamodbannotationsloadsave.dynamodb.Member;
 import com.amazon.ata.dynamodbannotationsloadsave.dynamodb.MemberDao;
+import com.amazon.ata.dynamodbannotationsloadsave.exceptions.MemberNotFoundException;
 import com.amazon.ata.input.console.ATAUserHandler;
 
 /**
@@ -39,13 +40,14 @@ public class LoginHandler implements DiscussionCliOperationHandler {
     }
 
     private Member findOrCreateMember(String username) {
-        Member member = memberDao.getMember(username);
-
-        if (null == member) {
+        Member member;
+        try{
+            member = memberDao.getMember(username);
+        } catch(MemberNotFoundException ex){
+            System.out.println("Member doesn't exist. Creating a new user...");
             member = new Member(username);
             memberDao.createMember(member);
         }
-
         return member;
     }
 

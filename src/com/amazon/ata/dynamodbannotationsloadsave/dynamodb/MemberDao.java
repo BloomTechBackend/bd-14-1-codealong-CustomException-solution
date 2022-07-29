@@ -1,5 +1,6 @@
 package com.amazon.ata.dynamodbannotationsloadsave.dynamodb;
 
+import com.amazon.ata.dynamodbannotationsloadsave.exceptions.MemberNotFoundException;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 
 /**
@@ -21,12 +22,15 @@ public class MemberDao {
      * @param username The username to look for
      * @return The Member with the given username, if one exists. {@code null} otherwise.
      */
-    public Member getMember(String username) {
+    public Member getMember(String username) throws MemberNotFoundException {
         if (username.equals("")) {
             throw new IllegalArgumentException("username cannot be empty");
         }
-
-        return mapper.load(Member.class, username);
+        Member member = mapper.load(Member.class, username);
+        if (member == null){
+            throw new MemberNotFoundException(String.format("%s member doesn't exist", username));
+        }
+        return member;
     }
 
     /**
